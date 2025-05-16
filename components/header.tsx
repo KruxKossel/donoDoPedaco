@@ -94,8 +94,10 @@ export function Header() {
   return (
     <header 
       className={cn(
-        "sticky top-0 w-full transition-all duration-300 z-40 border-b",
-        isScrolled ? "bg-background/90 backdrop-blur-md shadow-sm" : "bg-background"
+        "sticky top-0 w-full transition-all duration-300 z-40",
+        isScrolled || mobileMenuOpen 
+          ? "bg-background border-b shadow-sm" 
+          : "bg-background/95 backdrop-blur-sm border-b"
       )}
     >
       <div className="container mx-auto flex items-center justify-between h-16 sm:h-20">
@@ -134,14 +136,16 @@ export function Header() {
           </nav>
         </div>
         
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-2">
           <ModeToggle />
           
-          {/* Botão do menu mobile */}
           <Button 
             variant="ghost" 
             size="icon" 
-            className="md:hidden"
+            className={cn(
+              "md:hidden relative z-50",
+              mobileMenuOpen && "bg-background hover:bg-background"
+            )}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
           >
@@ -155,31 +159,40 @@ export function Header() {
       </div>
       
       {/* Menu mobile */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 top-16 z-50 bg-background md:hidden">
-          <nav className="container mx-auto py-8">
-            <ul className="flex flex-col space-y-4">
+      <div
+        className={cn(
+          "fixed inset-0 z-40 md:hidden bg-background/95 backdrop-blur-md transition-all duration-300",
+          mobileMenuOpen 
+            ? "opacity-100 pointer-events-auto" 
+            : "opacity-0 pointer-events-none"
+        )}
+        aria-hidden={!mobileMenuOpen}
+      >
+        <nav className="fixed inset-y-0 right-0 w-full max-w-xs h-full bg-background shadow-xl border-l">
+          <div className="h-16 sm:h-20" aria-hidden="true" /> {/* Espaçador para o header */}
+          <div className="px-4 py-6">
+            <ul className="space-y-4">
               {navLinks.map((link, index) => (
                 <li key={index}>
-                  <Link 
+                  <Link
                     href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
                     className={cn(
-                      "block py-3 text-lg transition-colors duration-200 hover:text-primary",
+                      "block py-2 text-lg transition-colors duration-200",
                       (pathname === link.exactPath || 
                        (pathname === "/cardapio" && link.href.includes("cardapio")))
                         ? "text-primary font-medium"
-                        : "text-muted-foreground"
+                        : "text-foreground hover:text-primary"
                     )}
-                    onClick={() => setMobileMenuOpen(false)}
                   >
                     {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
-          </nav>
-        </div>
-      )}
+          </div>
+        </nav>
+      </div>
     </header>
   )
 }

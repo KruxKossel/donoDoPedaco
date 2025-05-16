@@ -1,0 +1,81 @@
+/* Estilos essenciais do calendário */
+.rdp {
+  --rdp-cell-size: 40px;
+  --rdp-accent-color: hsl(var(--primary));
+  --rdp-background-color: hsl(var(--background));
+  margin: 1em;
+}
+
+/* Tema escuro */
+.dark .rdp {
+  --rdp-accent-color: hsl(var(--primary));
+  --rdp-background-color: hsl(var(--background));
+}
+
+/* Estilos dos botões e dias */
+.rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+  background-color: hsl(var(--muted));
+}
+
+.rdp-day_selected,
+.rdp-day_selected:hover {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.rdp-day_today {
+  font-weight: bold;
+  color: hsl(var(--primary));
+}
+
+.rdp-button {
+  color: hsl(var(--foreground));
+}
+
+.rdp-head_cell {
+  color: hsl(var(--muted-foreground));
+  font-weight: 600;
+}
+
+/* Melhorias para mobile */
+@media (max-width: 640px) {
+  .rdp {
+    --rdp-cell-size: 36px; /* Ligeiramente menor em mobile */
+    margin: 0.5em;
+  }
+
+  .rdp-button {
+    font-size: 0.875rem;
+  }
+
+  .rdp-head_cell {
+    font-size: 0.75rem;
+  }
+}
+
+/* Estilos do input de tempo */
+input[type="time"] {
+  color: hsl(var(--foreground));
+  background-color: hsl(var(--background));
+  border-color: hsl(var(--border));
+}
+
+/* Correções para tema escuro */
+.dark input[type="time"] {
+  color: hsl(var(--foreground));
+  background-color: hsl(var(--background));
+}
+
+/* Melhorias de contraste */
+.rdp-day_disabled {
+  opacity: 0.5;
+}
+
+.rdp-nav_button:hover:not([disabled]) {
+  background-color: hsl(var(--muted));
+}
+
+.rdp-caption_label {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+} 
