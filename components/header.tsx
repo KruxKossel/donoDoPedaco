@@ -166,7 +166,9 @@ export function Header() {
             ? "opacity-100 pointer-events-auto" 
             : "opacity-0 pointer-events-none"
         )}
-        aria-hidden={!mobileMenuOpen}
+        role="dialog"
+        aria-modal={mobileMenuOpen}
+        aria-label="Menu de navegação"
       >
         <nav className="fixed inset-y-0 right-0 w-full max-w-xs h-full bg-background shadow-xl border-l">
           <div className="h-16 sm:h-20" aria-hidden="true" /> {/* Espaçador para o header */}

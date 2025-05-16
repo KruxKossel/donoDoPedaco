@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -21,8 +21,17 @@ interface OrderFormProps {
   type: "cake" | "snack"
 }
 
+// Constantes de validação
+const STORE_HOURS = {
+  open: "06:00",
+  close: "18:30"
+}
+
+const WHATSAPP_NUMBER = "5516997783037" // Idealmente, isso viria de uma variável de ambiente
+
 export function OrderForm({ type }: OrderFormProps) {
   const [showConfirmation, setShowConfirmation] = useState(false)
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({})
   const [formData, setFormData] = useState({
     // Campos comuns
     name: "",
@@ -42,9 +51,54 @@ export function OrderForm({ type }: OrderFormProps) {
     cookingType: "frito",
   })
 
+  const validateDate = (date: string) => {
+    const selectedDate = new Date(date)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    if (selectedDate < today) {
+      return "A data de retirada não pode ser no passado"
+    }
+
+    const dayOfWeek = selectedDate.getDay()
+    if (dayOfWeek === 0) {
+      return "A padaria não funciona aos domingos"
+    }
+
+    return ""
+  }
+
+  const validateTime = (time: string) => {
+    if (!time) return ""
+
+    const [hours, minutes] = time.split(":").map(Number)
+    const [openHours, openMinutes] = STORE_HOURS.open.split(":").map(Number)
+    const [closeHours, closeMinutes] = STORE_HOURS.close.split(":").map(Number)
+
+    const timeValue = hours * 60 + minutes
+    const openValue = openHours * 60 + openMinutes
+    const closeValue = closeHours * 60 + closeMinutes
+
+    if (timeValue < openValue || timeValue > closeValue) {
+      return `Horário de funcionamento: ${STORE_HOURS.open} às ${STORE_HOURS.close}`
+    }
+
+    return ""
+  }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
+
+    // Validação em tempo real
+    if (name === "pickupDate") {
+      const error = validateDate(value)
+      setValidationErrors(prev => ({ ...prev, pickupDate: error }))
+    }
+    if (name === "pickupTime") {
+      const error = validateTime(value)
+      setValidationErrors(prev => ({ ...prev, pickupTime: error }))
+    }
   }
 
   const handleSelectChange = (name: string, value: string) => {
@@ -63,6 +117,11 @@ export function OrderForm({ type }: OrderFormProps) {
     setFormData(prev => ({ ...prev, flavorsQuantity: flavorsText }))
   }
 
+  const sanitizeText = (text: string) => {
+    // Remove caracteres potencialmente perigosos para URLs
+    return text.replace(/[<>{}[\]\\]/g, "")
+  }
+
   const formatWhatsAppMessage = () => {
     let message = `Olá! Gostaria de fazer uma encomenda de ${type === "cake" ? "bolo" : "salgados"}:\n\n`
 
@@ -70,35 +129,67 @@ export function OrderForm({ type }: OrderFormProps) {
       message += `Peso: ${formData.weight}kg\n`
       message += `Tipo de massa: ${formData.cakeType}\n`
       message += `Sabores: ${formData.flavors}\n`
-      message += `Decoração: ${formData.decoration}\n`
+      message += `Decoração: ${sanitizeText(formData.decoration)}\n`
     } else {
       message += `Quantidade total: ${formData.quantity}\n`
       message += `Sabores e quantidades: ${formData.flavorsQuantity}\n`
-      message += `Divisão dos sabores: ${formData.flavorsObservation}\n`
+      message += `Divisão dos sabores: ${sanitizeText(formData.flavorsObservation)}\n`
       message += `Tipo: ${formData.cookingType}\n`
     }
 
     message += `\nRetirada:\nData: ${formData.pickupDate}\n`
     message += `Horário: ${formData.pickupTime}\n`
-    message += `Nome: ${formData.name}`
+    message += `Nome: ${sanitizeText(formData.name)}`
 
     return encodeURIComponent(message)
   }
 
+  const validateForm = () => {
+    const errors: {[key: string]: string} = {}
+
+    // Validação de data e hora
+    const dateError = validateDate(formData.pickupDate)
+    const timeError = validateTime(formData.pickupTime)
+
+    if (dateError) errors.pickupDate = dateError
+    if (timeError) errors.pickupTime = timeError
+
+    // Validações específicas por tipo
+    if (type === "cake") {
+      if (!formData.flavors) {
+        errors.flavors = "Selecione pelo menos um sabor"
+      }
+    } else {
+      if (!formData.flavorsQuantity) {
+        errors.flavorsQuantity = "Selecione as quantidades dos sabores"
+      }
+    }
+
+    setValidationErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setShowConfirmation(true)
+    if (validateForm()) {
+      setShowConfirmation(true)
+    }
   }
 
   const handleConfirm = () => {
     const message = formatWhatsAppMessage()
-    window.open(`https://wa.me/5516997783037?text=${message}`, "_blank")
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, "_blank")
     setShowConfirmation(false)
   }
 
+  // Reseta erros quando o tipo muda
+  useEffect(() => {
+    setValidationErrors({})
+  }, [type])
+
   return (
     <>
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6" noValidate>
         {type === "cake" && (
           <div className="bg-muted/30 p-3 sm:p-4 rounded-lg text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6">
             Esse formulário é apenas para agilizar o processo, informações adicionais podem ser conversadas com o confeiteiro. 
@@ -150,6 +241,9 @@ export function OrderForm({ type }: OrderFormProps) {
               <div className="space-y-2">
                 <Label className="text-sm sm:text-base">Sabores (até 2)</Label>
                 <FlavorSelector onChange={handleFlavorsChange} maxFlavors={2} />
+                {validationErrors.flavors && (
+                  <p className="text-sm text-destructive" role="alert">{validationErrors.flavors}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -194,6 +288,9 @@ export function OrderForm({ type }: OrderFormProps) {
                   <p className="text-sm text-muted-foreground">
                     Primeiro, informe a quantidade total de salgados acima
                   </p>
+                )}
+                {validationErrors.flavorsQuantity && (
+                  <p className="text-sm text-destructive" role="alert">{validationErrors.flavorsQuantity}</p>
                 )}
               </div>
 
@@ -240,7 +337,14 @@ export function OrderForm({ type }: OrderFormProps) {
                 onChange={handleInputChange}
                 required
                 className="text-sm sm:text-base"
+                aria-invalid={validationErrors.pickupDate ? "true" : "false"}
+                aria-describedby={validationErrors.pickupDate ? "date-error" : undefined}
               />
+              {validationErrors.pickupDate && (
+                <p className="text-sm text-destructive" role="alert" id="date-error">
+                  {validationErrors.pickupDate}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -249,15 +353,22 @@ export function OrderForm({ type }: OrderFormProps) {
                 type="time"
                 id="pickupTime"
                 name="pickupTime"
-                min="06:00"
-                max="18:30"
+                min={STORE_HOURS.open}
+                max={STORE_HOURS.close}
                 value={formData.pickupTime}
                 onChange={handleInputChange}
                 required
                 className="text-sm sm:text-base"
+                aria-invalid={validationErrors.pickupTime ? "true" : "false"}
+                aria-describedby={validationErrors.pickupTime ? "time-error" : undefined}
               />
+              {validationErrors.pickupTime && (
+                <p className="text-sm text-destructive" role="alert" id="time-error">
+                  {validationErrors.pickupTime}
+                </p>
+              )}
               <p className="text-xs sm:text-sm text-muted-foreground">
-                Horário de retirada: segunda a sábado, das 6h às 18h30
+                Horário de retirada: segunda a sábado, das {STORE_HOURS.open} às {STORE_HOURS.close}
               </p>
             </div>
           </div>
