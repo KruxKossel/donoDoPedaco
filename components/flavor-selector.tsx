@@ -51,11 +51,12 @@ export function FlavorSelector({ onChange, maxFlavors = 2 }: FlavorSelectorProps
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
         <Button
           type="button"
           variant={mode === "fixed" ? "default" : "outline"}
           onClick={() => setMode("fixed")}
+          className="w-full sm:w-auto"
         >
           Sabores Tradicionais (R$58/kg)
         </Button>
@@ -63,6 +64,7 @@ export function FlavorSelector({ onChange, maxFlavors = 2 }: FlavorSelectorProps
           type="button"
           variant={mode === "custom" ? "default" : "outline"}
           onClick={() => setMode("custom")}
+          className="w-full sm:w-auto"
         >
           Sabores Personalizados
         </Button>

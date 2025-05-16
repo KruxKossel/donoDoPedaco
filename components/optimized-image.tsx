@@ -13,25 +13,34 @@ export function OptimizedImage({
   src,
   className,
   priority = false,
+  loading = "lazy",
+  quality = 75,
   ...props
 }: OptimizedImageProps) {
   const [isLoading, setIsLoading] = useState(true)
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative overflow-hidden", className)}>
       <Image
         src={src}
         alt={alt}
         className={cn(
-          "transition-opacity duration-300",
-          isLoading ? "opacity-0" : "opacity-100"
+          "transition-all duration-300 ease-in-out",
+          isLoading 
+            ? "scale-110 blur-sm" 
+            : "scale-100 blur-0"
         )}
         onLoadingComplete={() => setIsLoading(false)}
         priority={priority}
+        loading={loading}
+        quality={quality}
         {...props}
       />
       {isLoading && (
-        <div className="absolute inset-0 bg-muted animate-pulse" />
+        <div 
+          className="absolute inset-0 bg-muted/50 animate-pulse" 
+          aria-hidden="true"
+        />
       )}
     </div>
   )
