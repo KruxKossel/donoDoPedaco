@@ -167,7 +167,6 @@ export function Header() {
             : "opacity-0 pointer-events-none"
         )}
         role="dialog"
-        aria-modal={mobileMenuOpen}
         aria-label="Menu de navegação"
       >
         <nav className="fixed inset-y-0 right-0 w-full max-w-xs h-full bg-background shadow-xl border-l">

@@ -28,6 +28,7 @@ export const metadata: Metadata = {
     title: "Dono do Pedaço",
     description: "Padaria artesanal em Araraquara",
     siteName: "Dono do Pedaço",
+    url: "https://dono-do-pedaco.vercel.app",
   }
 }
 
@@ -53,7 +54,7 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning className={inter.variable}>
       <head>
         <meta name="color-scheme" content="light dark" />
-        <link rel="canonical" href="https://www.donodopedaco.com.br" />
+        <link rel="canonical" href="https://dono-do-pedaco.vercel.app" />
       </head>
       <body className={`${inter.className} min-h-screen flex flex-col antialiased`}>
         <ThemeProvider

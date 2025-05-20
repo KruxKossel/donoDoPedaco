@@ -10,6 +10,7 @@ import { Header } from "@/components/header"
 import { WhatsAppButton } from "@/components/whatsapp-button"
 import { OrderForm } from "@/components/order-form"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import "./styles/maps.css"
 
 /**
  * Página inicial da Padaria Dono do Pedaço
@@ -200,11 +201,8 @@ export default function Home() {
             <div className="bg-muted rounded-xl overflow-hidden h-[250px] sm:h-[300px] md:h-auto">
               <iframe 
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3701.5731666297403!2d-48.1814646!3d-21.8123456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94b8f650b9424d0d%3A0x7cb3f1a3f0d9e8b0!2sR.%20dos%20Eletricit%C3%A1rios%2C%201535%20-%20Jardim%20Arco-%C3%8Dris%2C%20Araraquara%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1710524800000!5m2!1spt-BR!2sbr"
-                width="100%" 
-                height="100%" 
-                style={{ border: 0 }}
+                className="map-container"
                 allowFullScreen 
-                loading="lazy"
                 title="Localização da Panificadora Dono do Pedaço"
                 aria-label="Mapa mostrando a localização da padaria"
               ></iframe>
@@ -226,6 +224,8 @@ export default function Home() {
                   <h4 className="font-semibold text-sm sm:text-base mb-1">Horário de Funcionamento</h4>
                   <p className="text-sm text-muted-foreground">
                     Segunda a Sábado: 6h às 18h30
+                    <br />
+                    Feriados: 6h às 12h
                     <br />
                     Domingo: Fechado
                   </p>
@@ -260,6 +260,15 @@ export default function Home() {
       <footer className="bg-background border-t py-4 sm:py-6">
         <div className="container mx-auto text-center text-xs sm:text-sm text-muted-foreground px-4">
           <p>© 2025 Panificadora Dono do Pedaço. Todos os direitos reservados.</p>
+          <a 
+            href="https://portifolio-ellen-kos.netlify.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block mt-2 text-purple-600/70 hover:text-purple-600 transition-colors duration-300 font-medium"
+            aria-label="Design por Ellen Oliveira"
+          >
+            Design by Ellen Oliveira
+          </a>
         </div>
       </footer>
       
